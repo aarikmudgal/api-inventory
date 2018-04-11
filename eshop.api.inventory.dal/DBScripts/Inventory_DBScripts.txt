@@ -1,0 +1,18 @@
+﻿-- Table: public."ArticleStocks"
+
+-- DROP TABLE public."ArticleStocks";
+
+CREATE TABLE public."ArticleStocks"
+(
+    "ArticleId" integer NOT NULL,
+    "ArticleName" text COLLATE pg_catalog."default",
+    "TotalQuantity" integer,
+    CONSTRAINT "PK_ArticleStock" PRIMARY KEY ("ArticleId")
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public."ArticleStocks"
+    OWNER to "DotNetCoreUser";
