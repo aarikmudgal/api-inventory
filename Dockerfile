@@ -4,4 +4,4 @@ COPY . /app
 WORKDIR /app/eshop.api.inventory
 RUN dotnet restore
 CMD [ "dotnet", "run" ]
-EXPOSE 8001
+EXPOSE 8004
