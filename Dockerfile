@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:2.1-sdk
+FROM microsoft/dotnet
 RUN mkdir /app && cd /app
 COPY . /app
 WORKDIR /app/eshop.api.inventory
