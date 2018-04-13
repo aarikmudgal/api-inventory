@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -35,24 +35,20 @@ namespace eshop.api.inventory.Controllers
         [Route("health")]
         public IActionResult GetHealth(string health)
         {
-            //bool fileExists = System.IO.File.Exists("./customers.json");
             bool dbConnOk = false;
             string statusMessage = string.Empty;
             try
             {
-                if (_context.CheckConnection())
-                {
-                    dbConnOk = true;
-                    statusMessage = "Inventory Service is Healthy";
-                }
+                _context.CheckConnection(out dbConnOk);
+                statusMessage = $"Order service is Healthy";
 
             }
             catch (Exception ex)
             {
-                statusMessage = $"Inventory database not available - {ex.Message}";
+                statusMessage = $"Order database or service not available - {ex.Message}";
 
             }
-            IActionResult response = dbConnOk ? Ok("Inventory Service is Healthy") : StatusCode(500, "Inventory database not available");
+            IActionResult response = dbConnOk ? Ok(statusMessage) : StatusCode(500, statusMessage);
             return response;
         }
 
