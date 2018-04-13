@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using eshop.api.inventory.dal.Models;
@@ -14,17 +14,24 @@ namespace eshop.api.inventory.dal.DBContext
         }
         public DbSet<ArticleStock> ArticleStocks { get; set; }
 
-        public bool CheckConnection()
+        public void CheckConnection(out bool dbStatusOK)
         {
             try
             {
+
                 this.Database.OpenConnection();
+                this.Database.ExecuteSqlCommand("SELECT 1");
                 this.Database.CloseConnection();
-                return true;
+                dbStatusOK = true;
             }
             catch (Exception ex)
             {
+                dbStatusOK = false;
                 throw ex;
+            }
+            finally
+            {
+                this.Database.CloseConnection();
             }
         }
     }
