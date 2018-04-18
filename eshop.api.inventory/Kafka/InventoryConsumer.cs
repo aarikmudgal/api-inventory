@@ -29,7 +29,7 @@ namespace eshop.api.inventory.Kafka
             var config = new Dictionary<string, object>
             {
                 {"group.id", "simple_consumer"},
-                {"bootstrap.servers", "35.201.187.234:9092" },
+                {"bootstrap.servers", "35.202.105.179:9092" },
                 {"enable.auto.commit", "false" }
             };
 
