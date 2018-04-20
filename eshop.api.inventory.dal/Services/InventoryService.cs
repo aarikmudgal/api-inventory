@@ -6,6 +6,7 @@ using eshop.api.inventory.dal.Models;
 using Microsoft.EntityFrameworkCore;
 
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace eshop.api.inventory.dal.Services
 {
@@ -33,11 +34,11 @@ namespace eshop.api.inventory.dal.Services
             }
         }
 
-        public IEnumerable<ArticleStock> GetInventory()
+        public async Task<IEnumerable<ArticleStock>> GetInventory()
         {
             try
             {
-                return _context.ArticleStocks;
+                return await _context.ArticleStocks.ToListAsync(); ;
             }
             catch (Exception e)
             {
@@ -45,21 +46,22 @@ namespace eshop.api.inventory.dal.Services
                 throw e;
             }
         }
-        public ArticleStock GetArticleStock(int articleid)
+        public async Task<ArticleStock> GetArticleStock(int articleid)
         {
-            return _context.ArticleStocks.SingleOrDefault(a => a.ArticleId == articleid);
+            return await _context.ArticleStocks.SingleOrDefaultAsync(a => a.ArticleId == articleid);
         }
 
-        public bool AddArticleStock(List<ArticleStock> articleStocks, out string statusMessage)
+        public async Task<ReturnResult> AddArticleStock(List<ArticleStock> articleStocks)
         {
+            ReturnResult result = new ReturnResult();
             try
             {
-                _context.ArticleStocks.AddRange(articleStocks);
+                await _context.ArticleStocks.AddRangeAsync(articleStocks);
                 
-                int status = _context.SaveChanges();
-                
-                statusMessage = "New articles add successfully to the inventory";
-                return true;
+                await _context.SaveChangesAsync();
+
+                result.StatusMessage = "New articles add successfully to the inventory";
+                return result;
             }
             catch (Exception)
             {
@@ -69,27 +71,27 @@ namespace eshop.api.inventory.dal.Services
             }
         }
 
-        public bool UpdateArticleStock(int articleid, ArticleStock articleStock, out ArticleStock updatedArticleStock, out string statusMessage)
+        public async Task<ReturnResult> UpdateArticleStock(int articleid, ArticleStock articleStock)
         {
             _context.Entry(articleStock).State = EntityState.Modified;
-
+            ReturnResult result = new ReturnResult();
             try
             {
                 if (!ArticleStockExists(articleid))
                 {
-                    updatedArticleStock = null;
-                    statusMessage = $"Article ID {articleid} does not exist in the inventory";
+                    result.UpdatedArticleStock = null;
+                    result.StatusMessage = $"Article ID {articleid} does not exist in the inventory";
                 }
 
 
-                _context.SaveChanges();
-                statusMessage = $"Article stock updated successfully for article Id - {articleid}";
-                updatedArticleStock = articleStock;
-                return true;
+                await _context.SaveChangesAsync();
+                result.StatusMessage = $"Article stock updated successfully for article Id - {articleid}";
+                result.UpdatedArticleStock = articleStock;
+                return result;
             }
             catch (DbUpdateConcurrencyException e)
             {
-                statusMessage = e.Message;
+                result.StatusMessage = e.Message;
                 throw e;
             }
         }
@@ -98,27 +100,28 @@ namespace eshop.api.inventory.dal.Services
             return _context.ArticleStocks.Any(e => e.ArticleId == id);
         }
 
-        public bool DeleteArticleStock(int articleid, out ArticleStock deletedArticleStock, out string statusMessage)
+        public async Task<ReturnResult> DeleteArticleStock(int articleid)
         {
+            ReturnResult result = new ReturnResult();
             try
             {
-                var articleStock = _context.ArticleStocks.SingleOrDefault(a => a.ArticleId == articleid);
+                var articleStock = await _context.ArticleStocks.SingleOrDefaultAsync(a => a.ArticleId == articleid);
                 if (articleStock == null)
                 {
-                    deletedArticleStock = null;
-                    statusMessage = $"Article with id - {articleid} not found in the inventory";
-                    return false;
+                    result.UpdatedArticleStock = null;
+                    result.StatusMessage = $"Article with id - {articleid} not found in the inventory";
+                    return result;
                 }
                 _context.ArticleStocks.Remove(articleStock);
-                _context.SaveChanges();
-                deletedArticleStock = articleStock;
-                statusMessage = $"Article with id - {articleid} deleted successfully";
-                return true;
+                await _context.SaveChangesAsync();
+                result.UpdatedArticleStock = articleStock;
+                result.StatusMessage = $"Article with id - {articleid} deleted successfully";
+                return result;
             }
             catch (Exception e)
             {
-                statusMessage = e.Message;
-                deletedArticleStock = null;
+                result.StatusMessage = e.Message;
+                result.UpdatedArticleStock = null;
                 throw e;
             }
         }
